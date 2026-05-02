@@ -1,11 +1,12 @@
 from http import HTTPStatus
 from http.server import ThreadingHTTPServer
 import json
+import os
 import threading
 import unittest
 from urllib.request import urlopen
 
-from server import Handler, MESSAGE
+from server import DEFAULT_MESSAGE, Handler, MESSAGE_ENV, message
 
 
 class HandlerTests(unittest.TestCase):
@@ -29,16 +30,24 @@ class HandlerTests(unittest.TestCase):
         self.assertEqual(response.status, HTTPStatus.OK)
         self.assertEqual(payload["status"], "ok")
         self.assertEqual(payload["service"], "hello-nas")
+        self.assertFalse(payload["message_configured"])
 
-    def test_message_is_hello_nas(self):
-        self.assertEqual(MESSAGE, "Hello NAS")
+    def test_default_message_is_hello_nas(self):
+        self.assertEqual(message(), DEFAULT_MESSAGE)
+
+    def test_message_can_come_from_env(self):
+        os.environ[MESSAGE_ENV] = "Configured NAS"
+        try:
+            self.assertEqual(message(), "Configured NAS")
+        finally:
+            os.environ.pop(MESSAGE_ENV, None)
 
     def test_handler_uses_http_ok(self):
         with urlopen(f"{self.base_url}/", timeout=2) as response:
             body = response.read().decode("utf-8")
 
         self.assertEqual(response.status, HTTPStatus.OK)
-        self.assertIn(MESSAGE, body)
+        self.assertIn(DEFAULT_MESSAGE, body)
 
 
 if __name__ == "__main__":

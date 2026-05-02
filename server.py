@@ -1,10 +1,29 @@
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from html import escape
 import json
 import os
 
 
-MESSAGE = "Hello NAS"
+DEFAULT_MESSAGE = "Hello NAS"
+MESSAGE_ENV = "HELLO_NAS_MESSAGE"
+
+
+def load_dotenv(path=".env"):
+    if not os.path.exists(path):
+        return
+
+    with open(path, encoding="utf-8") as env_file:
+        for raw_line in env_file:
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip())
+
+
+def message():
+    return os.environ.get(MESSAGE_ENV, DEFAULT_MESSAGE)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -12,19 +31,26 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/health":
-            self._send_json({"status": "ok", "service": "hello-nas"})
+            self._send_json(
+                {
+                    "status": "ok",
+                    "service": "hello-nas",
+                    "message_configured": MESSAGE_ENV in os.environ,
+                }
+            )
             return
 
         if self.path not in ("/", "/index.html"):
             self.send_error(HTTPStatus.NOT_FOUND, "Not found")
             return
 
+        page_message = escape(message())
         body = f"""<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{MESSAGE}</title>
+    <title>{page_message}</title>
     <style>
       :root {{
         color-scheme: light dark;
@@ -64,7 +90,7 @@ class Handler(BaseHTTPRequestHandler):
   </head>
   <body>
     <main>
-      <h1>{MESSAGE}</h1>
+      <h1>{page_message}</h1>
       <p>Deployed from GHCR to the NAS.</p>
     </main>
   </body>
@@ -90,6 +116,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    load_dotenv()
     host = os.environ.get("SERVICE_HOST", "0.0.0.0")
     port = int(os.environ.get("SERVICE_PORT", "8080"))
     server = ThreadingHTTPServer((host, port), Handler)
@@ -99,4 +126,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
