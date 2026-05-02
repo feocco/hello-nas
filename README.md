@@ -18,11 +18,12 @@ ghcr.io/feocco/hello-nas:latest
 
 ## Codex Skill Example
 
-The `.agents/skills/homelab-docker-deploy` directory contains a sanitized
-example Codex skill for this style of deployment workflow.
+The [homelab-docker-deploy skill](.agents/skills/homelab-docker-deploy)
+directory contains a sanitized example Codex skill for this style of deployment
+workflow.
 
-See `.agents/skills/homelab-docker-deploy/references/homelab-pattern.md` for
-the system pattern behind the example.
+See the [homelab pattern reference](.agents/skills/homelab-docker-deploy/references/homelab-pattern.md)
+for the system pattern behind the example.
 
 It is included for reference, not as production-ready configuration. Replace the
 placeholder owner, repository, host, and path values before adapting it.
