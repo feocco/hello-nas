@@ -16,6 +16,17 @@ The container image is published with GitHub Actions:
 ghcr.io/feocco/hello-nas:latest
 ```
 
+## Homelab SRE
+
+The `Homelab SRE Investigate` workflow runs from `repository_dispatch` events
+sent by `homelab-sre-agent`. It expects these repository secrets:
+
+- `OPENAI_API_KEY`: lets `openai/codex-action` run the investigation.
+- `SRE_GITHUB_TOKEN`: lets the workflow push the Codex branch and open a draft
+  PR.
+
+Use `.env.sre.example` as the local template for uploading those secret names.
+
 ## Codex Skill Example
 
 The [.agents/skills](.agents/skills) directory contains sanitized example Codex
