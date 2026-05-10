@@ -7,6 +7,7 @@ import os
 
 DEFAULT_MESSAGE = "Hello NAS"
 MESSAGE_ENV = "HELLO_NAS_MESSAGE"
+CANARY_STATUS = "ok"
 
 
 def load_dotenv(path=".env"):
@@ -41,7 +42,6 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         if self.path == "/canary-error":
-            print("ERROR hello-nas canary failure: CANARY_STATUS is undefined", flush=True)
             self._send_json({"status": CANARY_STATUS})
             return
 
