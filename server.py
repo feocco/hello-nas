@@ -40,6 +40,11 @@ class Handler(BaseHTTPRequestHandler):
             )
             return
 
+        if self.path == "/canary-error":
+            print("ERROR hello-nas canary failure: CANARY_STATUS is undefined", flush=True)
+            self._send_json({"status": CANARY_STATUS})
+            return
+
         if self.path not in ("/", "/index.html"):
             self.send_error(HTTPStatus.NOT_FOUND, "Not found")
             return

@@ -49,6 +49,13 @@ class HandlerTests(unittest.TestCase):
         self.assertEqual(response.status, HTTPStatus.OK)
         self.assertIn(DEFAULT_MESSAGE, body)
 
+    def test_canary_error_endpoint_is_ok(self):
+        with urlopen(f"{self.base_url}/canary-error", timeout=2) as response:
+            payload = json.loads(response.read())
+
+        self.assertEqual(response.status, HTTPStatus.OK)
+        self.assertEqual(payload["status"], "ok")
+
 
 if __name__ == "__main__":
     unittest.main()

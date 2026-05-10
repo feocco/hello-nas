@@ -16,6 +16,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Fetch SRE issue context
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .codex
+          echo ".codex/" >> .git/info/exclude
+          {
+            echo "# Homelab SRE Context"
+            echo
+            echo "- Issue URL: ${{ github.event.client_payload.issue_url }}"
+            echo "- Service: ${{ github.event.client_payload.service_name }}"
+            echo "- Container: ${{ github.event.client_payload.container_name }}"
+            echo "- Fingerprint: ${{ github.event.client_payload.fingerprint }}"
+            echo "- Deployment repo: ${{ github.event.client_payload.deployment_repo }}"
+            echo "- Deployment path: ${{ github.event.client_payload.deployment_path }}"
+            echo
+            echo "## Issue"
+            gh issue view "${{ github.event.client_payload.issue_number }}" \
+              --repo "${{ github.repository }}" \
+              --comments
+          } > .codex/homelab-sre-context.md
+
       - name: Run Codex
         uses: openai/codex-action@v1
         with:
@@ -34,6 +56,7 @@ jobs:
             - Deployment path: ${{ github.event.client_payload.deployment_path }}
 
             Requirements:
+            - Read `.codex/homelab-sre-context.md` before changing code.
             - Inspect the relevant code and tests.
             - Make the smallest plausible fix.
             - Add or update focused tests when possible.
