@@ -66,6 +66,7 @@ jobs:
       - name: Create draft pull request
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.SRE_GITHUB_TOKEN }}
           branch: codex/sre-${{ github.event.client_payload.issue_number }}-${{ github.event.client_payload.fingerprint }}
           title: "SRE: investigate issue #${{ github.event.client_payload.issue_number }}"
           body: |
