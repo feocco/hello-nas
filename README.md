@@ -9,6 +9,9 @@ The server uses only the Python standard library:
 
 - `GET /` shows a simple `Hello NAS` page.
 - `GET /health` returns `{"status":"ok","service":"hello-nas"}`.
+- `GET /docs` shows a browser-friendly service and endpoint summary.
+- `GET /openapi.json` returns the OpenAPI schema.
+- `GET /canary-error` exercises canary log/error plumbing.
 
 The container image is published with GitHub Actions:
 

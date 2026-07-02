@@ -32,6 +32,27 @@ class HandlerTests(unittest.TestCase):
         self.assertEqual(payload["service"], "hello-nas")
         self.assertFalse(payload["message_configured"])
 
+    def test_docs_page(self):
+        with urlopen(f"{self.base_url}/docs", timeout=2) as response:
+            body = response.read().decode("utf-8")
+
+        self.assertEqual(response.status, HTTPStatus.OK)
+        self.assertIn("text/html", response.headers["Content-Type"])
+        self.assertIn("Hello NAS", body)
+        self.assertIn("/openapi.json", body)
+        self.assertIn("/health", body)
+
+    def test_openapi_document(self):
+        with urlopen(f"{self.base_url}/openapi.json", timeout=2) as response:
+            payload = json.loads(response.read())
+
+        self.assertEqual(response.status, HTTPStatus.OK)
+        self.assertEqual(payload["openapi"], "3.1.0")
+        self.assertEqual(payload["info"]["title"], "Hello NAS")
+        self.assertIn("/", payload["paths"])
+        self.assertIn("/health", payload["paths"])
+        self.assertIn("/canary-error", payload["paths"])
+
     def test_default_message_is_hello_nas(self):
         self.assertEqual(message(), DEFAULT_MESSAGE)
 
